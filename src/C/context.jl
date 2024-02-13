@@ -4,20 +4,20 @@
 A handle to a loaded instance of libpython, its interpreter, function pointers, etc.
 """
 @kwdef mutable struct Context
-    is_embedded :: Bool = false
-    is_initialized :: Bool = false
-    is_preinitialized :: Bool = false
-    lib_ptr :: Ptr{Cvoid} = C_NULL
-    exe_path :: Union{String, Missing} = missing
-    lib_path :: Union{String, Missing} = missing
-    dlopen_flags :: UInt32 = RTLD_LAZY | RTLD_DEEPBIND | RTLD_GLOBAL
-    pyprogname :: Union{String, Missing} = missing
-    pyprogname_w :: Any = missing
-    pyhome :: Union{String, Missing} = missing
-    pyhome_w :: Any = missing
-    which :: Symbol = :unknown # :CondaPkg, :PyCall, :embedded or :unknown
-    version :: Union{VersionNumber, Missing} = missing
-    matches_pycall :: Union{Bool, Missing} = missing
+    is_embedded::Bool = false
+    is_initialized::Bool = false
+    is_preinitialized::Bool = false
+    lib_ptr::Ptr{Cvoid} = C_NULL
+    exe_path::Union{String,Missing} = missing
+    lib_path::Union{String,Missing} = missing
+    dlopen_flags::UInt32 = RTLD_LAZY | RTLD_DEEPBIND | RTLD_GLOBAL
+    pyprogname::Union{String,Missing} = missing
+    pyprogname_w::Any = missing
+    pyhome::Union{String,Missing} = missing
+    pyhome_w::Any = missing
+    which::Symbol = :unknown # :CondaPkg, :PyCall, :embedded or :unknown
+    version::Union{VersionNumber,Missing} = missing
+    matches_pycall::Union{Bool,Missing} = missing
 end
 
 const CTX = Context()
@@ -32,20 +32,25 @@ end
 
 function init_context()
 
-    CTX.is_embedded = false
-    CTX.is_initialized = false
-    CTX.is_preinitialized = false
-    CTX.lib_ptr = C_NULL
-    CTX.exe_path = missing
-    CTX.lib_path = missing
-    CTX.dlopen_flags = RTLD_LAZY | RTLD_DEEPBIND | RTLD_GLOBAL
-    CTX.pyprogname  = missing
-    CTX.pyprogname_w= missing
-    CTX.pyhome  = missing
-    CTX.pyhome_w = missing
-    CTX.which = :unknown # :CondaPkg, :PyCall, :embedded or :unknown
-    CTX.version  = missing
-    CTX.matches_pycall = missing
+    println("INITTING CTX")
+    println(CTX)
+    println("Py_IsInitialized")
+    println(Py_IsInitialized())
+
+    # CTX.is_embedded = false
+    # CTX.is_initialized = false
+    # CTX.is_preinitialized = false
+    # CTX.lib_ptr = C_NULL
+    # CTX.exe_path = missing
+    # CTX.lib_path = missing
+    # CTX.dlopen_flags = RTLD_LAZY | RTLD_DEEPBIND | RTLD_GLOBAL
+    # CTX.pyprogname  = missing
+    # CTX.pyprogname_w= missing
+    # CTX.pyhome  = missing
+    # CTX.pyhome_w = missing
+    # CTX.which = :unknown # :CondaPkg, :PyCall, :embedded or :unknown
+    # CTX.version  = missing
+    # CTX.matches_pycall = missing
 
     CTX.is_embedded = hasproperty(Base.Main, :__PythonCall_libptr)
 
@@ -114,7 +119,7 @@ function init_context()
 
         # Find and open Python library
         lib_path = something(
-            CTX.lib_path===missing ? nothing : CTX.lib_path,
+            CTX.lib_path === missing ? nothing : CTX.lib_path,
             get(ENV, "JULIA_PYTHONCALL_LIB", nothing),
             Some(nothing)
         )
@@ -153,7 +158,7 @@ function init_context()
         init_pointers()
 
         # Compare libpath with PyCall
-        @require PyCall="438e738f-606a-5dbb-bf0a-cddfbfd45ab0" init_pycall(PyCall)
+        @require PyCall = "438e738f-606a-5dbb-bf0a-cddfbfd45ab0" init_pycall(PyCall)
 
         # Initialize the interpreter
         with_gil() do
