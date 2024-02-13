@@ -32,10 +32,8 @@ end
 
 function init_context()
 
-    println("INITTING CTX")
+    println("CTX 0")
     println(CTX)
-    println("Py_IsInitialized")
-    println(Py_IsInitialized())
 
     # CTX.is_embedded = false
     # CTX.is_initialized = false
@@ -68,6 +66,8 @@ function init_context()
             # this ensures PyCall uses the same Python interpreter
             get!(ENV, "PYTHON", exe_path)
         end
+        println("CTX 1")
+        println(CTX)
     else
         # Find Python executable
         exe_path = get(ENV, "JULIA_PYTHONCALL_EXE", "")
@@ -101,6 +101,9 @@ function init_context()
             CTX.which = :unknown
         end
 
+        println("CTX 2")
+        println(CTX)
+
         # Ensure Python is runnable
         try
             run(pipeline(`$exe_path --version`, stdout=devnull, stderr=devnull))
@@ -108,6 +111,10 @@ function init_context()
             error("Python executable $(repr(exe_path)) is not executable.")
         end
         CTX.exe_path = exe_path
+
+
+        println("CTX 3")
+        println(CTX)
 
         # For calling Python with UTF-8 IO
         function python_cmd(args)
@@ -123,6 +130,8 @@ function init_context()
             get(ENV, "JULIA_PYTHONCALL_LIB", nothing),
             Some(nothing)
         )
+        println("LIB PATH")
+        println(lib_path)
         if lib_path !== nothing
             lib_ptr = dlopen_e(lib_path, CTX.dlopen_flags)
             if lib_ptr == C_NULL
@@ -149,6 +158,9 @@ function init_context()
                 """)
         end
 
+        println("CTX 4")
+        println(CTX)
+
         # Close the library when Julia exits
         atexit() do
             dlclose(CTX.lib_ptr)
@@ -162,6 +174,15 @@ function init_context()
 
         # Initialize the interpreter
         with_gil() do
+            println("CTX 5")
+            println(CTX)
+            println("Py_IsInitialized")
+            try
+                println(Py_IsInitialized())
+            catch
+                println("Cannot run Py_IsInitialized")
+            end
+
             CTX.is_preinitialized = Py_IsInitialized() != 0
             if CTX.is_preinitialized
                 @assert CTX.which == :PyCall || CTX.matches_pycall isa Bool
