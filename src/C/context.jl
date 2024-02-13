@@ -32,6 +32,21 @@ end
 
 function init_context()
 
+    CTX.is_embedded = false
+    CTX.is_initialized = false
+    CTX.is_preinitialized = false
+    CTX.lib_ptr = C_NULL
+    CTX.exe_path = missing
+    CTX.lib_path = missing
+    CTX.dlopen_flags = RTLD_LAZY | RTLD_DEEPBIND | RTLD_GLOBAL
+    CTX.pyprogname  = missing
+    CTX.pyprogname_w= missing
+    CTX.pyhome  = missing
+    CTX.pyhome_w = missing
+    CTX.which = :unknown # :CondaPkg, :PyCall, :embedded or :unknown
+    CTX.version  = missing
+    CTX.matches_pycall = missing
+
     CTX.is_embedded = hasproperty(Base.Main, :__PythonCall_libptr)
 
     if CTX.is_embedded
